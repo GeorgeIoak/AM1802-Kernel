@@ -32,18 +32,20 @@
 #include <mach/mux.h>
 #include <mach/nand.h>
 
-#define LCDKBOARD_PHY_ID		"davinci_mdio-0:07"
+#define LCDKBOARD_PHY_ID		"davinci_mdio-0:01" //GI Change from 07 140213
 #define DA850_LCDK_MMCSD_CD_PIN		GPIO_TO_PIN(4, 0)
 
+#if defined(CONFIG_USB_OHCI_HCD) //GI 040213
 #define DA850_USB1_VBUS_PIN		GPIO_TO_PIN(2, 4)
 #define DA850_USB1_OC_PIN		GPIO_TO_PIN(6, 13)
+#endif
 
 #define LCDKBOARD_SATA_REFCLKPN_RATE   (100 * 1000 * 1000)
 
-#define DA850_LCDK_USER_LED0		GPIO_TO_PIN(6, 12)
-#define DA850_LCDK_USER_LED1		GPIO_TO_PIN(6, 13)
-#define DA850_LCDK_USER_LED2		GPIO_TO_PIN(2, 12)
-#define DA850_LCDK_USER_LED3		GPIO_TO_PIN(0, 9)
+#define DA850_LCDK_USER_LED0		GPIO_TO_PIN(7, 13) //GI Change 140213
+#define DA850_LCDK_USER_LED1		GPIO_TO_PIN(7, 14) //Needed to subtract
+#define DA850_LCDK_USER_LED2		GPIO_TO_PIN(7, 15) //to get the correct
+#define DA850_LCDK_USER_LED3		GPIO_TO_PIN(7, 16) //gpio # in linux
 
 #define	DA850_LCDK_USER_KEY0            GPIO_TO_PIN(2, 4)
 #define	DA850_LCDK_USER_KEY1            GPIO_TO_PIN(2, 5)
@@ -59,6 +61,7 @@
 
 #define DA850_LCD_PWR_PIN              GPIO_TO_PIN(2, 8)
 #define DA850_LCD_BL_PIN               GPIO_TO_PIN(2, 15)
+
 
 #if defined(CONFIG_MTD_NAND_DAVINCI) || \
 	defined(CONFIG_MTD_NAND_DAVINCI_MODULE)
@@ -293,7 +296,8 @@ static __init void omapl138_lcdk_mmc_init(void)
 mmc_setup_mmcsd_fail:
 	gpio_free(DA850_LCDK_MMCSD_CD_PIN);
 }
-
+// gi 040213
+#if defined(CONFIG_USB_OHCI_HCD) //GI 040213
 static irqreturn_t omapl138_lcdk_usb_ocic_irq(int irq, void *dev_id);
 
 static const short da850_lcdk_usb11_pins[] = {
@@ -318,7 +322,7 @@ static irqreturn_t omapl138_lcdk_usb_ocic_irq(int irq, void *handler)
 		((da8xx_ocic_handler_t)handler)(&omapl138_lcdk_usb11_pdata, 1);
 	return IRQ_HANDLED;
 }
-
+#endif
 /* VGA */
 static const short omapl138_lcdk_lcdc_pins[] = {
 	DA850_GPIO2_8, DA850_GPIO2_15,
@@ -456,11 +460,11 @@ static __init void omapl138_lcdk_usb_init(void)
 				__func__, ret);
 
 	__raw_writel(cfgchip2, DA8XX_SYSCFG0_VIRT(DA8XX_CFGCHIP2_REG));
-
+/* gi 040213
 	if (HAS_OHCI)
 		da8xx_board_usb_init(da850_lcdk_usb11_pins,
 				     &omapl138_lcdk_usb11_pdata);
-
+*/
 	return;
 }
 
